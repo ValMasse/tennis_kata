@@ -5,6 +5,15 @@ public class Joueur {
     private int jeu;
     private int set;
     private boolean aGagnePoint;
+    private boolean gagneAvantage;
+
+    public boolean isGagneAvantage() {
+        return gagneAvantage;
+    }
+
+    public void setGagneAvantage(boolean gagneAvantage) {
+        this.gagneAvantage = gagneAvantage;
+    }
 
     public void setNom(String nom) {
         this.nom = nom;
@@ -46,12 +55,13 @@ public class Joueur {
         return set;
     }
 
-    public Joueur(String nom, int score, int jeu, int set, boolean aGagnePoint) {
+    public Joueur(String nom, int score, int jeu, int set, boolean aGagnePoint, boolean gagneAvantage) {
         this.nom = nom;
         this.score = score;
         this.jeu = jeu;
         this.set = set;
         this.aGagnePoint = aGagnePoint;
+        this.gagneAvantage = gagneAvantage;
     }
 }
 
