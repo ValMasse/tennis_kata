@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CompteurDeScoreTennisTest {
 
+    private CompteurDeScoreTennis compteur;
+
     List<Joueur> joueurs = new ArrayList<Joueur>();
     List<Partie> parties = new ArrayList<Partie>();
 
@@ -29,14 +31,14 @@ class CompteurDeScoreTennisTest {
         List<Joueur> joueursPartie1 = new ArrayList<Joueur>();
         joueursPartie1.add(joueurs.get(0));
         joueursPartie1.add(joueurs.get(1));
-        Partie partie1 = new Partie("Match JH vs V", joueursPartie1);
+        Partie partie1 = new Partie("Match JH vs V", joueursPartie1, false, false);
         parties.add(partie1);
     }
 
     @Test
     @DisplayName("devrait créer une nouvelle partie")
     public void creerPartie(){
-        Partie partie1 = new Partie("partie1", joueurs);
+        Partie partie1 = new Partie("partie1", joueurs, false, false);
         assertNotNull(partie1);
     }
 
@@ -91,9 +93,7 @@ class CompteurDeScoreTennisTest {
         Partie partie1 = parties.get(0);
         Joueur joueur1 = partie1.getJoueurs().get(0);
         joueur1.setaGagnePoint(true);
-        if (joueur1.isaGagnePoint() == true && joueur1.getScore() == 0){
-            joueur1.setScore(15);
-        }
+        this.compteur.gagnerUnPoint(joueur1);
         assertEquals(15, joueur1.getScore());
     }
 
@@ -104,9 +104,7 @@ class CompteurDeScoreTennisTest {
         Joueur joueur1 = partie1.getJoueurs().get(0);
         joueur1.setaGagnePoint(true);
         joueur1.setScore(15);
-        if (joueur1.isaGagnePoint() == true && joueur1.getScore() == 15){
-            joueur1.setScore(30);
-        }
+        this.compteur.gagnerUnPoint(joueur1);
         assertEquals(30, joueur1.getScore());
     }
 
@@ -117,9 +115,7 @@ class CompteurDeScoreTennisTest {
         Joueur joueur1 = partie1.getJoueurs().get(0);
         joueur1.setaGagnePoint(true);
         joueur1.setScore(30);
-        if (joueur1.isaGagnePoint() == true && joueur1.getScore() == 30){
-            joueur1.setScore(40);
-        }
+        this.compteur.gagnerUnPoint(joueur1);
         assertEquals(40, joueur1.getScore());
     }
 
@@ -132,9 +128,7 @@ class CompteurDeScoreTennisTest {
         joueur1.setScore(40);
         joueur2.setScore(40);
         joueur1.setaGagnePoint(true);
-        if (joueur1.isaGagnePoint() == true && joueur1.getScore() == 40 && joueur2.getScore() == 40){
-            joueur1.setGagneAvantage(true);
-        }
+        this.compteur.gagnerUnPoint(joueur1);
         assertEquals(true, joueur1.isGagneAvantage());
     }
 
@@ -148,9 +142,7 @@ class CompteurDeScoreTennisTest {
         joueur2.setScore(40);
         joueur1.setGagneAvantage(true);
         joueur2.setaGagnePoint(true);
-        if (joueur2.isaGagnePoint() == true && joueur1.getScore() == 40 && joueur2.getScore() == 40 && joueur1.isGagneAvantage() == true){
-            joueur1.setGagneAvantage(false);
-        }
+        this.compteur.perdreLAvantage(joueur1);
         assertEquals(false, joueur1.isGagneAvantage());
     }
 
@@ -164,10 +156,7 @@ class CompteurDeScoreTennisTest {
         joueur2.setScore(40);
         joueur1.setGagneAvantage(true);
         joueur1.setaGagnePoint(true);
-        if (joueur1.isaGagnePoint() == true && joueur1.getScore() == 40 && joueur2.getScore() == 40 && joueur1.isGagneAvantage() == true){
-            joueur1.setGagneAvantage(false);
-            joueur1.setJeu(joueur1.getJeu()+1);
-        }
+        this.compteur.gagnerUnJeuAvecAvantage(joueur1, joueur2);
         assertEquals(1, joueur1.getJeu());
     }
 
@@ -177,33 +166,141 @@ class CompteurDeScoreTennisTest {
         Partie partie1 = parties.get(0);
         Joueur joueur1 = partie1.getJoueurs().get(0);
         Joueur joueur2 = partie1.getJoueurs().get(1);
-        int nbreJeuxJ1 = joueur1.getJeu();
-        joueur1.setJeu(joueur1.getJeu()+1);
-        if (joueur1.getJeu() != nbreJeuxJ1){
-            joueur1.setScore(0);
-            joueur2.setScore(0);
-        }
+        this.compteur.gagnerUnJeu(joueur1, joueur2);
         assertEquals(0, joueur1.getScore());
         assertEquals(0, joueur2.getScore());
     }
 
     @Test
-    @DisplayName("quand un joueur a gagné 6 jeu et l'autre moins de 4 alors le premier joueur gagne le set")
+    @DisplayName("quand un joueur a gagné 6 jeux et l'autre moins de 4 alors le premier joueur gagne le set")
     public void gagneUnSet(){
         Partie partie1 = parties.get(0);
         Joueur joueur1 = partie1.getJoueurs().get(0);
         Joueur joueur2 = partie1.getJoueurs().get(1);
         joueur1.setJeu(6);
         joueur2.setJeu(4);
-        if (joueur1.getJeu() == 6 && joueur2.getJeu() <= 4){
-            joueur1.setSet(joueur1.getSet()+1);
-            // On réinitialise les jeux
-            joueur1.setJeu(0);
-            joueur2.setJeu(0);
-        }
+        this.compteur.gagnerUnSet(joueur1, joueur2, partie1);
         assertEquals(1, joueur1.getSet());
     }
 
-    //@Test
-    //@DisplayName("si les 2 joueurs ont 5 jeux")
+    @Test
+    @DisplayName("si les 2 joueurs ont 5 jeux il faut avoir 2 jeux d'avance et 7 jeux pour gagner le set")
+    public void avoirDeuxJeuxDavancePourGagngerLeSet(){
+        Partie partie1 = parties.get(0);
+        Joueur joueur1 = partie1.getJoueurs().get(0);
+        Joueur joueur2 = partie1.getJoueurs().get(1);
+        joueur1.setJeu(5);
+        joueur2.setJeu(5);
+        joueur1.setScore(40);
+        joueur2.setScore(30);
+        this.compteur.gagnerUnJeu(joueur1, joueur2);
+        joueur1.setScore(40);
+        joueur2.setScore(30);
+        this.compteur.gagnerUnJeu(joueur1, joueur2);
+        this.compteur.gagnerUnSet(joueur1, joueur2, partie1);
+        assertEquals(1, joueur1.getSet());
+    }
+
+    @Test
+    @DisplayName("quand les 2 joueurs ont 6 jeux gagnés alors on passe en jeu décisif")
+    public void passerEnJeuDecisif(){
+        Partie partie1 = parties.get(0);
+        Joueur joueur1 = partie1.getJoueurs().get(0);
+        Joueur joueur2 = partie1.getJoueurs().get(1);
+        joueur1.setJeu(6);
+        joueur2.setJeu(6);
+        this.compteur.passerEnJeuDecisif(joueur1, joueur2, partie1);
+        assertEquals(true, partie1.isJeuDecisif());
+    }
+
+    @Test
+    @DisplayName("quand il y a jeu décisif les points sont comptés point par point")
+    public void pointsJeuDecisif(){
+        Partie partie1 = parties.get(0);
+        Joueur joueur1 = partie1.getJoueurs().get(0);
+        Joueur joueur2 = partie1.getJoueurs().get(1);
+        partie1.setJeuDecisif(true);
+        joueur1.setaGagnePoint(true);
+        this.compteur.compterPointParPoint(partie1, joueur1);
+        assertEquals(1, joueur1.getScore());
+    }
+
+        @Test
+        @DisplayName("Si un joueur gagne un point pendant un jeu decisif il passe de 0 à 1, puis 2, ... jusqu'à 7")
+        public void gagneUnPointPendantJD() {
+            Partie partie1 = parties.get(0);
+            Joueur joueur1 = partie1.getJoueurs().get(0);
+            Joueur joueur2 = partie1.getJoueurs().get(1);
+            // Le joueur1 est actuellement à 4 pts
+            joueur1.setScore(4);
+            partie1.setJeuDecisif(true);
+            joueur1.setaGagnePoint(true);
+            this.compteur.compterPointParPoint(partie1, joueur1);
+            assertEquals(5, joueur1.getScore());
+        }
+
+        @Test
+        @DisplayName("Il faut avoir deux points d'avance pour gagner le jeu et donc le set")
+        public void gagnerSetAvecDeuxPointsDAvance(){
+            Partie partie1 = parties.get(0);
+            Joueur joueur1 = partie1.getJoueurs().get(0);
+            Joueur joueur2 = partie1.getJoueurs().get(1);
+            joueur1.setJeu(6);
+            joueur2.setJeu(6);
+            partie1.setJeuDecisif(true);
+            joueur1.setScore(3);
+            joueur2.setScore(3);
+            joueur1.setaGagnePoint(true);
+            this.compteur.compterPointParPoint(partie1, joueur1);
+            joueur1.setaGagnePoint(true);
+            this.compteur.compterPointParPoint(partie1, joueur1);
+            this.compteur.gagnerUnJeuDecisif(partie1, joueur1,joueur2);
+            this.compteur.gagnerUnSet(joueur1, joueur2, partie1);
+            assertEquals(7, joueur1.getJeu());
+            assertEquals(1, joueur1.getSet());
+        }
+
+        @Test
+        @DisplayName("Le premier joueur a 2 sets gagnés gagne la partie")
+        public void gagnerLaPartie(){
+            Partie partie1 = parties.get(0);
+            Joueur joueur1 = partie1.getJoueurs().get(0);
+            Joueur joueur2 = partie1.getJoueurs().get(1);
+            joueur1.setSet(1);
+            joueur1.setJeu(5);
+            joueur2.setJeu(2);
+            joueur1.setScore(40);
+            joueur2.setScore(15);
+            joueur1.setaGagnePoint(true);
+            this.compteur.gagnerUnJeu(joueur1, joueur2);
+            this.compteur.gagnerUnSet(joueur1, joueur2, partie1);
+            this.compteur.gagnerLaPartie(joueur1, partie1);
+            assertTrue(partie1.isPartieTerminee() == true);
+        }
+
+        @Test
+        @DisplayName("Quand un joueur a gagné, il n'est plus possible de changer les scores")
+        public void partieTermineeScoreBloque(){
+            
+        }
+
+        @Test
+        @DisplayName("L'utilisateur doit être avertie que la partie est finie")
+        public void avertissementPartieTerminee(){
+            Partie partie1 = parties.get(0);
+            Joueur joueur1 = partie1.getJoueurs().get(0);
+            Joueur joueur2 = partie1.getJoueurs().get(1);
+            partie1.setPartieTerminee(true);
+            this.compteur.afficherNomVainqueurEtPartieTerminee(partie1, joueur1, joueur2);
+            assertNotNull(this.compteur.getMessage());
+        }
+
+
+
+
+
+
+
+
+
 }
