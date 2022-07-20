@@ -6,12 +6,6 @@ public class CompteurDeScoreTennis {
         return message;
     }
 
-    public static void partieEnCours(Partie partie){
-        if (partie.isPartieTerminee() == false){
-
-        }
-    }
-
     public static void gagnerUnPoint(Joueur joueur){
         if (joueur.getScore() <= 15){
             joueur.setScore(joueur.getScore() + 15);
@@ -99,8 +93,13 @@ public class CompteurDeScoreTennis {
 
     public static void bloquerLesScores(Partie partie, Joueur joueur1, Joueur joueur2){
         if (partie.isPartieTerminee() == true){
-            System.out.println(joueur1.getNom() + " score =  " + joueur1.getScore());
-            System.out.println(joueur2.getNom() + " score =  " + joueur2.getScore());
+            System.out.println(joueur1.getNom() + " score =  " + joueur1.getSet() + " set(s)");
+            System.out.println(joueur2.getNom() + " score =  " + joueur2.getSet() + " set(s)");
+            if (partie.isPartieTerminee() == true && joueur1.getSet() > joueur2.getSet()){
+                System.out.println( " BRAVO  " + joueur1.getNom());
+            } else {
+                System.out.println(" BRAVO  " + joueur2.getNom());
+            }
         }
     }
 

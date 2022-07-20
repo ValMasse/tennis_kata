@@ -281,7 +281,22 @@ class CompteurDeScoreTennisTest {
         @Test
         @DisplayName("Quand un joueur a gagné, il n'est plus possible de changer les scores")
         public void partieTermineeScoreBloque(){
-            
+            Partie partie1 = parties.get(0);
+            partie1.setPartieTerminee(true);
+            Joueur joueur1 = partie1.getJoueurs().get(0);
+            Joueur joueur2 = partie1.getJoueurs().get(1);
+            joueur1.setSet(1);
+            joueur2.setSet(1);
+            joueur1.setJeu(5);
+            joueur2.setJeu(2);
+            joueur1.setScore(40);
+            joueur2.setScore(30);
+            joueur1.setaGagnePoint(true);
+            this.compteur.gagnerUnJeu(joueur1, joueur2);
+            this.compteur.gagnerUnSet(joueur1, joueur2, partie1);
+            this.compteur.bloquerLesScores(partie1, joueur1, joueur2);
+            assertEquals(6, joueur1.getJeu());
+            assertEquals(2, joueur1.getSet());
         }
 
         @Test
